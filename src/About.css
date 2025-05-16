@@ -1,0 +1,37 @@
+.gradient-heading {
+  background: linear-gradient(270deg, #ff416c, #ff4b2b, #1e90ff, #32cd32, #ff416c);
+  background-size: 800% 800%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 8s ease infinite;
+  font-weight: bold;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.icon-bg {
+  padding: 6px;
+  border-radius: 50%;
+  animation: bgPulse 4s ease-in-out infinite;
+}
+
+.icon-about { background-color: #ff416c; }
+.icon-features { background-color: #1e90ff; }
+.icon-tech { background-color: #ff9800; }
+.icon-formula { background-color: #32cd32; }
+.icon-purpose { background-color: #9c27b0; }
+
+@keyframes bgPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+}
