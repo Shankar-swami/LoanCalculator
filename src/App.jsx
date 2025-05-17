@@ -33,7 +33,7 @@ function App() {
       <nav className="navbar">
         <div className="nav-left">
           <Link to="/" className="brand">
-            Loan Calculator
+            MONTHLY EMI LOAN CALCULATOR
           </Link>
         </div>
 

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import './App.css';
+import './LoanCalculator.css'
 
 function LoanCalculator() {
-  const [loan, setLoan] = useState(100);
+  const [loan, setLoan] = useState(1000);
   const [interest, setInterest] = useState(3);
   const [year, setYear] = useState(3);
   const [schedule, setSchedule] = useState([]);
@@ -15,48 +16,65 @@ function LoanCalculator() {
 
   const [isCalculated, setIsCalculated] = useState(false);
 
-  const calculateSchedule = () => {
-    if (
-      loan === '' || interest === '' || year === '' ||
-      isNaN(parseFloat(loan)) || isNaN(parseFloat(interest)) || isNaN(parseInt(year))
-    ) {
-      alert("Please enter valid values in all fields.");
-      return;
-    }
+const calculateSchedule = () => {
+  const principal = parseFloat(loan);
+  const annualRate = parseFloat(interest);
+  const years = parseInt(year);
 
-    const principal = parseFloat(loan);
-    const annualRate = parseFloat(interest);
-    const years = parseInt(year);
-    const months = years * 12;
-    const monthlyRate = annualRate / 12 / 100;
+  if (
+    loan === '' || interest === '' || year === '' ||
+    isNaN(principal) || isNaN(annualRate) || isNaN(years)
+  ) {
+    alert("Please enter valid values in all fields.");
+    return;
+  }
 
-    const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) /
-                (Math.pow(1 + monthlyRate, months) - 1);
+  if (principal < 1000) {
+    alert("Loan amount should be at least 1000.");
+    return;
+  }
 
-    setMonthlyEMI(emi.toFixed(2));
+  if (annualRate <= 0) {
+    alert("Interest rate must be greater than 0.");
+    return;
+  }
 
-    let balance = principal;
-    const result = [];
+  if (years <= 0) {
+    alert("Term (years) must be greater than 0.");
+    return;
+  }
 
-    for (let i = 1; i <= months; i++) {
-      const interestAmount = balance * monthlyRate;
-      const principalAmount = emi - interestAmount;
-      balance -= principalAmount;
+  const months = years * 12;
+  const monthlyRate = annualRate / 12 / 100;
 
-      result.push({
-        month: i,
-        principal: principalAmount,
-        interest: interestAmount,
-        balance: balance > 0 ? balance : 0,
-      });
-    }
+  const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+              (Math.pow(1 + monthlyRate, months) - 1);
 
-    setSchedule(result);
-    setConvertedSchedule([]);
-    setConvertedEMI(null);
-    setConversionRate(null);
-    setIsCalculated(true);
-  };
+  setMonthlyEMI(emi.toFixed(2));
+
+  let balance = principal;
+  const result = [];
+
+  for (let i = 1; i <= months; i++) {
+    const interestAmount = balance * monthlyRate;
+    const principalAmount = emi - interestAmount;
+    balance -= principalAmount;
+
+    result.push({
+      month: i,
+      principal: principalAmount,
+      interest: interestAmount,
+      balance: balance > 0 ? balance : 0,
+    });
+  }
+
+  setSchedule(result);
+  setConvertedSchedule([]);
+  setConvertedEMI(null);
+  setConversionRate(null);
+  setIsCalculated(true);
+};
+
 
   const convertCurrency = async () => {
     if (schedule.length === 0) return alert("Calculate schedule first!");
@@ -95,35 +113,44 @@ function LoanCalculator() {
     <>
 <h2 className="animated-heading">Loan Calculator Dashboard</h2>
       <div className="controls">
-        <input
-          type="number"
-          placeholder="Loan Amount (USD)"
-          value={loan}
-          onChange={(e) => setLoan(e.target.value)}
-          required
-        />
+        <div className="input-wrapper">
+  <input
+    type="number"
+    id="loan"
+    value={loan}
+    onChange={(e) => setLoan(e.target.value)}
+    required
+  />
+  <label htmlFor="loan">Loan Amount (USD)</label>
+</div>
 
-        <input
-          type="number"
-          placeholder="Interest Rate (%)"
-          value={interest}
-          onChange={(e) => setInterest(e.target.value)}
-          required
-        />
+<div className="input-wrapper">
+  <input
+    type="number"
+    id="interest"
+    value={interest}
+    onChange={(e) => setInterest(e.target.value)}
+    required
+  />
+  <label htmlFor="interest">Interest Rate (%)</label>
+</div>
 
-        <input
-          type="number"
-          placeholder="Term (Years)"
-          value={year}
-          max={30}
-          onChange={(e) => {
-            const val = e.target.value;
-            if (val === '' || (Number(val) >= 1 && Number(val) <= 30)) {
-              setYear(val);
-            }
-          }}
-          required
-        />
+<div className="input-wrapper">
+  <input
+    type="number"
+    id="year"
+    value={year}
+    max={30}
+    onChange={(e) => {
+      const val = e.target.value;
+      if (val === '' || (Number(val) >= 1 && Number(val) <= 30)) {
+        setYear(val);
+      }
+    }}
+    required
+  />
+  <label htmlFor="year">Term (Years)</label>
+</div>
 
         <button onClick={calculateSchedule}>Calculate</button>
       </div>
