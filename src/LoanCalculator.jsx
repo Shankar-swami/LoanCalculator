@@ -60,12 +60,15 @@ const calculateSchedule = () => {
     const principalAmount = emi - interestAmount;
     balance -= principalAmount;
 
-    result.push({
-      month: i,
-      principal: principalAmount,
-      interest: interestAmount,
-      balance: balance > 0 ? balance : 0,
-    });
+   // In calculateSchedule function, when pushing schedule items:
+result.push({
+  month: i,
+  emi: emi,
+  principal: principalAmount,
+  interest: interestAmount,
+  balance: balance > 0 ? balance : 0,
+});
+
   }
 
   setSchedule(result);
@@ -96,11 +99,13 @@ const calculateSchedule = () => {
       setConvertedEMI(emiConverted);
 
       const converted = schedule.map(item => ({
-        month: item.month,
-        principal: (item.principal * rate).toFixed(2),
-        interest: (item.interest * rate).toFixed(2),
-        balance: (item.balance * rate).toFixed(2),
-      }));
+  month: item.month,
+  emi: item.emi * rate, // include emi conversion here
+  principal: (item.principal * rate).toFixed(2),
+  interest: (item.interest * rate).toFixed(2),
+  balance: (item.balance * rate).toFixed(2),
+}));
+
 
       setConvertedSchedule(converted);
     } catch (error) {
@@ -188,24 +193,33 @@ const calculateSchedule = () => {
               <h3 className="animated-heading1">Amortization Schedule</h3>
             </div>
             <table cellPadding="5">
-              <thead>
-                <tr>
-                  <th>Month</th>
-                  <th>Principal {convertedSchedule.length ? `(${currency})` : '(USD)'}</th>
-                  <th>Interest {convertedSchedule.length ? `(${currency})` : '(USD)'}</th>
-                  <th>Remaining Balance {convertedSchedule.length ? `(${currency})` : '(USD)'}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(convertedSchedule.length ? convertedSchedule : schedule).map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.month}</td>
-                    <td>{convertedSchedule.length ? item.principal : parseFloat(item.principal).toFixed(2)}</td>
-                    <td>{convertedSchedule.length ? item.interest : parseFloat(item.interest).toFixed(2)}</td>
-                    <td>{convertedSchedule.length ? item.balance : parseFloat(item.balance).toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
+             {/* Add EMI header in table */}
+<thead>
+  <tr>
+    <th>Month</th>
+    <th>EMI {convertedSchedule.length ? `(${currency})` : '(USD)'}</th>  {/* New column */}
+    <th>Principal {convertedSchedule.length ? `(${currency})` : '(USD)'}</th>
+    <th>Interest {convertedSchedule.length ? `(${currency})` : '(USD)'}</th>
+    <th>Remaining Balance {convertedSchedule.length ? `(${currency})` : '(USD)'}</th>
+  </tr>
+</thead>
+
+<tbody>
+  {(convertedSchedule.length ? convertedSchedule : schedule).map((item, index) => (
+    <tr key={index}>
+      <td>{item.month}</td>
+      <td>
+      {convertedSchedule.length && conversionRate
+      ? Number(item.emi).toFixed(2)
+      : Number(item.emi).toFixed(2)}
+      </td>
+      <td>{convertedSchedule.length ? item.principal : parseFloat(item.principal).toFixed(2)}</td>
+      <td>{convertedSchedule.length ? item.interest : parseFloat(item.interest).toFixed(2)}</td>
+      <td>{convertedSchedule.length ? item.balance : parseFloat(item.balance).toFixed(2)}</td>
+    </tr>
+  ))}
+</tbody>
+
             </table>
           </div>
         </>
